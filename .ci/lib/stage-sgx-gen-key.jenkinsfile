@@ -1,0 +1,5 @@
+stage('sgx-gen-key') {
+    sh '''
+        gramine-sgx-gen-private-key
+    '''
+}
