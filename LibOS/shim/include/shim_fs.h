@@ -149,9 +149,6 @@ struct shim_dentry {
     /* file permissions: PERM_rwxrwxrwx, etc. */
     mode_t perm;
 
-    /* Filesystem-specific data. Protected by `lock`. */
-    void* data;
-
     /* Inode associated with this dentry. Currently optional, and only for the use of underlying
      * filesystem (see `shim_inode` below). Protected by `g_dcache_lock`. */
     struct shim_inode* inode;
@@ -164,7 +161,6 @@ struct shim_dentry {
      * `shim_fs_lock.c`. */
     bool maybe_has_fs_locks;
 
-    struct shim_lock lock;
     REFTYPE ref_count;
 };
 
