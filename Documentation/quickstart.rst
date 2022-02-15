@@ -65,7 +65,7 @@ Without SGX::
 
 With SGX::
 
-   make SGX=1 SGX_SIGNER_KEY="$HOME"/.config/gramine/enclave-key.pem
+   make SGX=1
    gramine-sgx helloworld
 
 For more complex examples, see :file:`CI-Examples` directory.

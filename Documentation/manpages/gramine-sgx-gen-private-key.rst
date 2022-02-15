@@ -13,9 +13,9 @@ Synopsis
 Description
 ===========
 
-:program:`gramine-sgx-get-token` is used to generate the private key suitable
-for signing SGX enclaves. SGX requires RSA 3072 keys with public exponent equal
-to 3.
+:program:`gramine-sgx-gen-private-key` is used to generate the private key
+suitable for signing SGX enclaves. SGX requires RSA 3072 keys with public
+exponent equal to 3.
 
 The default path is ``$XDG_CONFIG_HOME/gramine/enclave-key.pem`` (which is
 usually ``$HOME/.config/gramine/enclave-key.pem`` — see `XDG Base Directory
@@ -43,4 +43,3 @@ Command line arguments
 .. option:: --quiet, -q
 
     Don't print details to standard output.
-
