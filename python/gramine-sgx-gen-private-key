@@ -20,7 +20,7 @@ from graminelibos import sgx_sign
     default=os.fspath(sgx_sign.SGX_RSA_KEY_PATH))
 def main(output, force, quiet):
     output = pathlib.Path(output)
-    old_umask = os.umask(0o77)
+    old_umask = os.umask(0o077)
     try:
         output.parent.mkdir(exist_ok=True, parents=True)
         with click.open_file(output, f'{"w" if force else "x"}b') as file:
