@@ -12,7 +12,12 @@ import sys
 import toml
 
 from . import ninja_syntax, _CONFIG_SYSLIBDIR, _CONFIG_PKGLIBDIR
-from .sgx_sign import SGX_RSA_KEY_PATH
+
+try:
+    from .sgx_sign import SGX_RSA_KEY_PATH as _SGX_RSA_KEY_PATH
+except ImportError:
+    # if we don't have sgx built, this won't work anyway
+    _SGX_RSA_KEY_PATH = '/dev/null'
 
 
 class TestConfig:
@@ -72,7 +77,7 @@ class TestConfig:
 
         self.key = os.environ.get('SGX_SIGNER_KEY', None)
         if not self.key:
-            self.key = os.fspath(SGX_RSA_KEY_PATH)
+            self.key = os.fspath(_SGX_RSA_KEY_PATH)
 
         self.all_manifests = self.manifests + self.sgx_manifests
 
