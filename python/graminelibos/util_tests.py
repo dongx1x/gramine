@@ -12,6 +12,7 @@ import sys
 import toml
 
 from . import ninja_syntax, _CONFIG_SYSLIBDIR, _CONFIG_PKGLIBDIR
+from .sgx_sign import SGX_RSA_KEY_PATH
 
 
 class TestConfig:
@@ -69,6 +70,10 @@ class TestConfig:
         else:
             raise Exception('Cannot determine coreutils libdir')
 
+        self.key = os.environ.get('SGX_SIGNER_KEY', None)
+        if not self.key:
+            self.key = os.fspath(SGX_RSA_KEY_PATH)
+
         self.all_manifests = self.manifests + self.sgx_manifests
 
     @staticmethod
@@ -99,6 +104,7 @@ class TestConfig:
         ninja.variable('BINARY_DIR', self.binary_dir)
         ninja.variable('ARCH_LIBDIR', self.arch_libdir)
         ninja.variable('COREUTILS_LIBDIR', self.coreutils_libdir)
+        ninja.variable('KEY', self.key)
         ninja.variable('GRAMINE_LIBC', self.libc)
         ninja.newline()
 
@@ -117,7 +123,7 @@ class TestConfig:
 
         ninja.rule(
             name='sgx-sign',
-            command=('gramine-sgx-sign --quiet --manifest $in --depfile $out.d '
+            command=('gramine-sgx-sign --quiet --manifest $in --key $KEY --depfile $out.d '
                      '--output $out'),
             depfile='$out.d',
             description='SGX sign: $out',
@@ -183,6 +189,7 @@ class TestConfig:
                 implicit_outputs=[f'{name}.sig'],
                 rule='sgx-sign',
                 inputs=[f'{name}.manifest'],
+                implicit=([self.key]),
             )
 
             ninja.build(
