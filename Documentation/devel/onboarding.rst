@@ -272,8 +272,8 @@ fine on native Linux but fails under Gramine::
    - Analyze FS mount points (``fs.mount`` fields) in the manifest file
      carefully. Check for duplicate mount points -- remember that a duplicate
      mount point's path *shadows* the previous mount point's path (i.e., if you
-     have ``fs.mount.libs.path = "/lib"`` and then ``fs.mount.more_libs.path =
-     "/lib"``, then files from the former path will disappear inside Gramine).
+     have two mounts with ``path = "/lib"``, then files from the former mount
+     will disappear inside Gramine).
 
    - Collect the strace (system call trace) log on the original (native)
      application, e.g.::
