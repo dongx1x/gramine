@@ -684,9 +684,9 @@ void put_dentry(struct shim_dentry* dent);
  *
  * \param  dent  the dentry (should be either invalid or negative)
  *
- * Resets the following dentry fields: `state`, `fs`, `type`, `perm`, `data`, `inode`. Ensures that
- * there is no leftover state from a file previously associated with the dentry, and the dentry can
- * be used for a new file.
+ * Resets the following dentry fields: `state`, `fs`, `type`, `perm`, `inode`. Ensures that there is
+ * no leftover state from a file previously associated with the dentry, and the dentry can be used
+ * for a new file.
  *
  * The caller should hold `g_dcache_lock`.
  *
