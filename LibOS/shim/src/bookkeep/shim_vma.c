@@ -1233,7 +1233,8 @@ BEGIN_CP_FUNC(vma) {
         if (vma->file)
             DO_CP(handle, vma->file, &new_vma->file);
 
-        bool remap_in_child = true;
+        /* by default, file-backed memory (if shared and/or untainted) is re-mapped in child */
+        bool remap_from_file = !(vma->flags & VMA_UNMAPPED) && vma->file;
 
         /*
          * Check whether we need to checkpoint memory this vma bookkeeps: it should be mapped and it
@@ -1245,7 +1246,7 @@ BEGIN_CP_FUNC(vma) {
          */
         if (!(vma->flags & VMA_UNMAPPED) && (!vma->file ||
                     (vma->flags & (VMA_TAINTED | MAP_PRIVATE)) == (VMA_TAINTED | MAP_PRIVATE))) {
-            remap_in_child = false;
+            remap_from_file = false;
 
             if (!vma->file) {
                 /* Send anonymous memory region. */
@@ -1281,7 +1282,7 @@ BEGIN_CP_FUNC(vma) {
         }
 
         ADD_CP_FUNC_ENTRY(off);
-        ADD_CP_ENTRY(ADDR, (void*)remap_in_child);
+        ADD_CP_ENTRY(ADDR, (uintptr_t)remap_from_file);
     } else {
         new_vma = (struct shim_vma_info*)(base + off);
     }
@@ -1293,7 +1294,7 @@ END_CP_FUNC(vma)
 
 BEGIN_RS_FUNC(vma) {
     struct shim_vma_info* vma = (void*)(base + GET_CP_FUNC_ENTRY());
-    bool remap_in_child = (bool)GET_CP_ENTRY(ADDR);
+    bool remap_from_file = (bool)GET_CP_ENTRY(ADDR);
     CP_REBASE(vma->file);
 
     int ret = bkeep_mmap_fixed(vma->addr, vma->length, vma->prot, vma->flags | MAP_FIXED, vma->file,
@@ -1305,7 +1306,7 @@ BEGIN_RS_FUNC(vma) {
         struct shim_fs* fs = vma->file->fs;
         get_handle(vma->file);
 
-        if (remap_in_child) {
+        if (remap_from_file) {
             /* Parent did not send file-backed memory region, need to mmap file contents. */
             if (!fs || !fs->fs_ops || !fs->fs_ops->mmap)
                 return -EINVAL;
